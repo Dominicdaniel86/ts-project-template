@@ -151,4 +151,4 @@ Nodemon is set to restart the server whenever files in `src/` change (`watch: ["
 
 ### .gitignore
 
-This .gitignore file contains a basic, pre-defined list of file endings and directory names, that you usally don't want to push to the repository (such as .env files). It's a predefined file, that was taken from URL.
+This .gitignore file contains a basic, pre-defined list of file endings and directory names, that you usally don't want to push to the repository (such as .env files). It's a predefined file, that was taken from [https://github.com/github/gitignore](https://github.com/github/gitignore), a repository that contains multiple pre-defined `.gitignore` templates.
