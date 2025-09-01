@@ -149,7 +149,9 @@ fi
 # * 2 - Set module type
 if [ $option_module -eq 2 ]; then
     # ESM
-    sed -i 's/"type": *"commonjs"/"type": "module"/' backend/package.json
+    if [ $option_backend -eq 1 ]; then
+        sed -i 's/"type": *"commonjs"/"type": "module"/' backend/package.json
+    else
     sed -i 's/"type": *"commonjs"/"type": "module"/' frontend/package.json
 fi
 
@@ -224,11 +226,21 @@ rm -rf licences/
 
 # * 5 - Install packages
 
-cd backend
-npm install
-cd ../frontend
+if [ $option_backend -eq 1 ]; then
+    cd backend
+    npm install
+    cd ..
+fi
+
+cd frontend
 npm install
 cd ..
+
+# * 6 - Move frontend directory files up, if no backend exists
+if [ $option_backend -eq 2 ]; then
+    mv frontend/* .
+    rmdir frontend
+fi
 
 echo "Setup completed!"
 rm setup.sh
