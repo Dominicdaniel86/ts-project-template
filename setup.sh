@@ -5,6 +5,13 @@ option_module=0
 option_docker=0
 option_licence=0
 option_commit=0
+option_details=0
+
+project_name=""
+project_description=""
+project_author=""
+project_repo_url=""
+project_keywords=""
 
 commit_message="Initial commit"
 
@@ -133,7 +140,62 @@ done
 
 echo ""
 
-# * 5 - Commit changes
+# * 5 - Add more information
+
+options=(
+  "Yes"
+  "No"
+)
+
+echo "Add additional information for package.json?"
+select opt in "${options[@]}"; do
+    case $opt in
+        "Yes")
+            option_details=1
+            break
+            ;;
+        "No")
+            option_details=2
+            break
+            ;;
+        *)
+            echo "Invalid option. Please choose 1 or 2."
+            ;;
+    esac
+done
+
+echo ""
+
+if [ $option_details -eq 1 ]; then
+        echo "Enter project name:"
+        read project_name
+        echo "Enter project description:"
+        read project_description
+    if [ $option_licence -eq 1 ] || [ $option_licence -eq 2 ]; then
+        while [ -z "$project_author" ]; do
+            echo "Enter author name (required for license):"
+            read project_author
+        done
+    else
+        echo "Enter author name:"
+        read project_author
+    fi
+        echo "Enter repository URL:"
+        read project_repo_url
+        echo "Enter keywords (comma-separated):"
+        read project_keywords
+    echo ""
+fi
+
+if [ $option_details -eq 2 ] && { [ $option_licence -eq 1 ] || [ $option_licence -eq 2 ]; }; then
+    while [ -z "$project_author" ]; do
+        echo "Enter author name (required for license):"
+        read project_author
+    done
+    echo ""
+fi
+
+# * 6 - Commit changes
 
 options=(
   "Yes"
@@ -159,7 +221,7 @@ done
 
 echo ""
 
-# Ask for commit message
+# 6.2 Ask for commit message
 
 if [ $option_commit -eq 1 ]; then
     echo "Enter commit message (Default: 'Initial commit'):"
@@ -211,10 +273,7 @@ else
     rm docker-compose.yaml
 fi
 
-# TODO - Docker related files + Nodemon
-
 # * 4 - Licence
-
 case $option_licence in
     1)
         cp licences/MIT-LICENCE LICENCE
@@ -269,8 +328,67 @@ esac
 
 rm -rf licences/
 
-# * 5 - Install packages
+# * 6 - Add information
+# Step 1 - package.json - Backend
+if [ $option_backend -eq 1 ]; then
+    file="backend/package.json"
+    if [ -n "$project_name" ]; then
+        sed -i "s/\"name\": *\"\"/\"name\": \"$(echo "$project_name" | sed 's/[&|]/\\&/g')-backend\"/" "$file"
+        # Also handle case where name is not empty but default (e.g. "backend")
+        sed -i "s/\"name\": *\"backend\"/\"name\": \"$(echo "$project_name" | sed 's/[&|]/\\&/g')-backend\"/" "$file"
+    fi
+    if [ -n "$project_description" ]; then
+        sed -i "s/\"description\": *\"\"/\"description\": \"$(echo "$project_description" | sed 's/[&|]/\\&/g')\"/" "$file"
+    fi
+    if [ -n "$project_author" ]; then
+        sed -i "s/\"author\": *\"\"/\"author\": \"$(echo "$project_author" | sed 's/[&|]/\\&/g')\"/" "$file"
+    fi
+    if [ -n "$project_repo_url" ]; then
+        sed -i "s|\"url\": *\"\"|\"url\": \"$(echo "$project_repo_url" | sed 's/[&|]/\\&/g')\"|" "$file"
+    fi
+    if [ -n "$project_keywords" ]; then
+        IFS=',' read -ra keywords_array <<< "$project_keywords"
+        keywords_json=$(printf '"%s",' "${keywords_array[@]}")
+        keywords_json="[${keywords_json%,}]"
+        sed -i "s/\"keywords\": *\[\]/\"keywords\": $keywords_json/" "$file"
+    fi
+fi
+# Step 2 - package.json - Frontend
+file="frontend/package.json"
+if [ -n "$project_name" ]; then
+    sed -i "s/\"name\": *\"\"/\"name\": \"$(echo "$project_name" | sed 's/[&|]/\\&/g')-frontend\"/" "$file"
+    # Also handle case where name is not empty but default (e.g. "frontend")
+    sed -i "s/\"name\": *\"frontend\"/\"name\": \"$(echo "$project_name" | sed 's/[&|]/\\&/g')-frontend\"/" "$file"
+fi
+if [ -n "$project_description" ]; then
+    sed -i "s/\"description\": *\"\"/\"description\": \"$(echo "$project_description" | sed 's/[&|]/\\&/g')\"/" "$file"
+fi
+if [ -n "$project_author" ]; then
+    sed -i "s/\"author\": *\"\"/\"author\": \"$(echo "$project_author" | sed 's/[&|]/\\&/g')\"/" "$file"
+fi
+if [ -n "$project_repo_url" ]; then
+    sed -i "s|\"url\": *\"\"|\"url\": \"$(echo "$project_repo_url" | sed 's/[&|]/\\&/g')\"|" "$file"
+fi
+if [ -n "$project_keywords" ]; then
+    IFS=',' read -ra keywords_array <<< "$project_keywords"
+    keywords_json=$(printf '"%s",' "${keywords_array[@]}")
+    keywords_json="[${keywords_json%,}]"
+    sed -i "s/\"keywords\": *\[\]/\"keywords\": $keywords_json/" "$file"
+fi
 
+# Step 3 - licence
+# TODO - Support all Unix based systems (MacOS)
+year=$(date +%Y)
+file="LICENCE"
+if [ $option_licence -eq 1 ]; then
+    repl=$(printf 'Copyright (c) %s %s' "$year" "$project_author" | sed 's/[&|]/\\&/g')
+    sed -i "3{/^Copyright (c) \[year\] \[fullname\]$/s||$repl|}" "$file"
+elif [ $option_licence -eq 2 ]; then
+    repl=$(printf 'Copyright %s %s' "$year" "$project_author" | sed 's/[&|]/\\&/g')
+    sed -i "189s|^\([[:space:]]*\).*|\1$repl|" "$file"
+fi
+
+# * 7 - Install packages
 if [ $option_backend -eq 1 ]; then
     cd backend
     npm install
@@ -281,14 +399,13 @@ cd frontend
 npm install
 cd ..
 
-# * 6 - Move frontend directory files up, if no backend exists
+# * 8 - Move frontend directory files up, if no backend exists
 if [ $option_backend -eq 2 ]; then
     mv frontend/* .
     rmdir frontend
 fi
 
-# * 7 - Commit changes
-
+# * 9 - Commit changes
 if [ $option_commit -eq 1 ]; then
     git add .
     git commit -m "$commit_message"
