@@ -111,10 +111,6 @@ More options will follow in the future.
 
 #### Frontend
 
-### ESLint
-
-#### Frontend
-
 - **`Flat config (ESLint v9)`** – Uses a flat `eslint.config.mjs`.
 - **`files: ["**/*.ts"]`** – Lint all TypeScript files.
 - **`ignores: ["eslint.config.mjs"]`** – Skip the config file itself.
