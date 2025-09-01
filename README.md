@@ -9,6 +9,7 @@ This repository offers a ready-to-use TypeScript template with sensible defaults
 3. Give the repository a name and define the visbility.
 4. Clone the repository (`git clone <URL>`) and open the project in your terminal (`cd <project-name>`).
 5. Execute the setup.sh script (`./setup.sh`) and follow the setup instructions.
+6. Adjust the `package.json` file(s) to match your project (fields like *repository*, *author*, ..).
 
 ---
 
@@ -23,7 +24,8 @@ More options will follow in the future.
 
 ### Docker
 
-- **`Yes`** - This project will inlcude a Docker integration. This will add a `docker-compose` file, a `Dockerfile` for the backend and alter the Nodemon configuration to work with Docker.
+- **`Yes - Docker-compose`** - This project will inlcude a Docker integration. This will add a `docker-compose` file, a `Dockerfile` for the backend and alter the Nodemon configuration to work with Docker.
+- **`Yes - Dockerfile only`** - This will still add a `Dockerfile` and alter the Nodemon configuration, but not add a `docker-compose` file.
 - **`No`** - This project will be pre-defined to be used for local development.
 
 ### Licence
@@ -46,7 +48,17 @@ More options will follow in the future.
 
 ### ESLint
 
-...
+- **`arrowParens: "always"`** – Always include parentheses around arrow function parameters, even if there’s only one.
+- **`bracketSpacing: true`** - Print spaces between brackets in object literals (`{ foo: bar }`).
+- **`embeddedLanguageFormatting: "auto"`** - Let Prettier automatically format code blocks within strings or templates.
+- **`endOfLine: "lf"`** – Enforce Unix-style line endings (`\n`), ensuring consistency across environments.
+- **`printWidth: 120`** – Enforces a wider maximum line length (*120 characters*) for better readability without excessive wrapping.
+- **`semi: true`** – Always add semicolons at the end of statements.
+- **`singleQuote: true`** – Use single quotes instead of double quotes for strings.
+- **`tabWidth: 4`** – Indent with 4 spaces per level.
+- **`trailingComma: "es5"`** – Add trailing commas where valid in ES5 (*objects, arrays, etc.*), but not in function arguments.
+- **`useTabs: false`** - Use spaces for indentation, not hard tabs.
+
 
 ### Prettier
 
