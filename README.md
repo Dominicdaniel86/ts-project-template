@@ -44,9 +44,95 @@ More options will follow in the future.
 
 ### TypeScript-Compiler
 
-...
+#### Backend
+
+- **`target: "ES2024"`** – Emit modern JavaScript with the latest language features.
+- **`lib: ["ES2024", "DOM"]`** – Type definitions for ES2024 + DOM APIs *(remove `"DOM"` if backend-only)*.
+- **`module: "NodeNext"`** – Native ESM output aligned with Node’s module system.
+- **`moduleResolution: "nodenext"`** – Resolve imports using Node’s ESM/CJS rules and `exports` fields.
+- **`rootDir: "./src"`** – Treat `src/` as the source root for compilation.
+- **`outDir: "./dist"`** – Emit compiled files to `dist/`.
+- **`baseUrl: "./"`** – Base directory for non-relative module imports.
+- **`resolveJsonModule: true`** – Allow `import data from "./file.json"` with proper typing.
+- **`sourceMap: true`** – Generate `.map` files so stack traces map back to `.ts`.
+- **`esModuleInterop: true`** – Improve CJS ↔ ESM interop (enables default imports from CJS packages).
+- **`allowSyntheticDefaultImports: true`** – Permit default-style imports when a module lacks a real default export.
+- **`forceConsistentCasingInFileNames: true`** – Enforce correct path casing across the project.
+- **`strict: true`** – Enable all strict type-checking options.
+- **`noImplicitAny: true`** – Disallow implicit `any` types.
+- **`noImplicitReturns: true`** – Require explicit returns in all code paths.
+- **`skipLibCheck: true`** – Skip type-checking of `.d.ts` in dependencies for faster builds.
+- **`include: ["src/**/*", "node_modules/@prisma/client"]`** – Compile project sources and Prisma client types.
+- **`exclude: ["node_modules", "dist"]`** – Ignore external deps and build output during compilation.
+
+#### Frontend
+
+- **`target: "ES2024"`** – Emit modern JavaScript with the latest language features.
+- **`lib: ["ES2024", "DOM"]`** – Include browser and modern ECMAScript type definitions.
+- **`module: "ESNext"`** – Keep native ESM syntax for optimal bundler tree-shaking.
+- **`moduleResolution: "bundler"`** – Resolve imports the same way modern bundlers (Vite/Webpack/Rspack) do.
+- **`rootDir: "./src"`** – Treat `src/` as the source root for compilation.
+- **`outDir: "./dist"`** – Emit compiled assets to `dist/`.
+- **`baseUrl: "./"`** – Base directory for absolute (non-relative) imports.
+- **`resolveJsonModule: true`** – Allow `import data from "./file.json"` with proper typing.
+- **`allowJs: true`** – Include `.js` files alongside `.ts`/`.tsx` in the program.
+- **`allowSyntheticDefaultImports: true`** – Permit default-style imports when a module lacks a real default export.
+- **`esModuleInterop: true`** – Improve CJS ↔ ESM interop for smoother imports.
+- **`forceConsistentCasingInFileNames: true`** – Enforce correct path casing across platforms.
+- **`strict: true`** – Enable all strict type-checking options.
+- **`noImplicitAny: true`** – Disallow implicit `any` types.
+- **`noImplicitReturns: true`** – Require explicit returns in all code paths.
+- **`skipLibCheck: true`** – Skip type-checking of dependency `.d.ts` files for faster builds.
+- **`include: ["src"]`** – Compile project sources in `src/`.
+- **`exclude: ["node_modules", "dist"]`** – Ignore external deps and build output during compilation.
 
 ### ESLint
+
+#### Backend
+
+- **`Flat config (ESLint v9)`** – Uses a flat `eslint.config.mjs` with per-file settings.
+- **`files: ["**/*.ts"]`** – Lint all TypeScript source files.
+- **`ignores: ["eslint.config.mjs"]`** – Skip the config file itself.
+- **`parser: @typescript-eslint/parser`** – TypeScript-aware parsing.
+- **`parserOptions.project: "./tsconfig.json"`** – Enable **type-aware** rules by pointing to the TS project.
+- **`parserOptions.sourceType: "module"`** – ESM syntax.
+- **`plugins: ["@typescript-eslint", "prettier", "unused-imports"]`** – TS rules, Prettier integration, and unused-imports utilities.
+- **`extends (via spreads)`** – Merge:
+  - **`typescript-eslint/configs/recommended`** – Core recommended TS rules.
+  - **`typescript-eslint/configs/recommendedTypeChecked`** – Extra rules that require type info.
+  - **`../shared/eslintRules.mjs`** – Your shared project rules.
+- **`@typescript-eslint/no-unused-vars: "warn"`** – Warn on unused vars; allow `_`-prefixed args/vars:
+  `{ argsIgnorePattern: "^_", varsIgnorePattern: "^_" }`.
+- **`@typescript-eslint/strict-boolean-expressions: "error"`** – Enforce strict truthiness checks.
+- **`no-process-exit: "error"`** – Forbid `process.exit()` (outside dedicated CLI code).
+- **`no-sync: "warn"`** – Discourage blocking sync Node APIs (e.g., `fs.*Sync`).
+- **`no-console: ["error", { allow: ["warn", "error"] }]`** – Block `console.log` but allow warnings/errors.
+- **`prettier` plugin active** – Formatting issues can surface as ESLint problems (rule severity as defined in shared rules).
+
+#### Frontend
+
+### ESLint
+
+#### Frontend
+
+- **`Flat config (ESLint v9)`** – Uses a flat `eslint.config.mjs`.
+- **`files: ["**/*.ts"]`** – Lint all TypeScript files.
+- **`ignores: ["eslint.config.mjs"]`** – Skip the config file itself.
+- **`parser: @typescript-eslint/parser`** – TypeScript-aware parsing.
+- **`parserOptions.project: "./tsconfig.json"`** – Enable **type-aware** rules using your TS project.
+- **`parserOptions.sourceType: "module"`** – ESM syntax.
+- **`plugins: ["@typescript-eslint", "prettier", "unused-imports"]`** – TS rules, Prettier integration, and unused-imports utilities.
+- **`extends (via spreads)`** – Merge:
+  - **`typescript-eslint/configs/recommended`**
+  - **`typescript-eslint/configs/recommendedTypeChecked`**
+  - **`../shared/eslintRules.mjs`** (shared rules)
+- **`@typescript-eslint/no-unused-vars: ["warn", { argsIgnorePattern: "^_" }]`** – Warn on unused vars; allow `_`-prefixed parameters.
+- **`no-alert: "error"`** – Forbid `alert`, `confirm`, and `prompt`.
+- **`no-restricted-globals: ["error", "event", "fdescribe"]`** – Disallow problematic browser globals.
+- **`no-console: ["warn", { allow: ["warn", "error"] }]`** – Allow `console.warn` / `console.error` only.
+- **`no-implicit-globals: "error"`** – Prevent accidental globals in the browser.
+
+### Prettier
 
 - **`arrowParens: "always"`** – Always include parentheses around arrow function parameters, even if there’s only one.
 - **`bracketSpacing: true`** - Print spaces between brackets in object literals (`{ foo: bar }`).
@@ -59,14 +145,9 @@ More options will follow in the future.
 - **`trailingComma: "es5"`** – Add trailing commas where valid in ES5 (*objects, arrays, etc.*), but not in function arguments.
 - **`useTabs: false`** - Use spaces for indentation, not hard tabs.
 
-
-### Prettier
-
-...
-
 ### Nodemon
 
-...
+Nodemon is set to restart the server whenever files in `src/` change (`watch: ["./src"]`) and to watch only TypeScript files (`ext: "ts"`). It runs the app without a build step using `ts-node`’s ESM loader and exposes the Node inspector on port **9229** (`exec: node --inspect=9229 --loader ts-node/esm ./src/index.ts`). For reliable reloads in Docker, WSL, or network filesystems, it uses polling (`legacy-watch: true`).
 
 ### .gitignore
 
