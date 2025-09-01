@@ -17,6 +17,7 @@ This repository offers a ready-to-use TypeScript template with sensible defaults
 ### Backend
 
 - **`Node.js`** - Node.js, the most common JavaScript/ TypeScript backend.
+- **`None`** - Frontend project only.
 
 More options will follow in the future.
 
