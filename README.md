@@ -9,7 +9,6 @@ This repository offers a ready-to-use TypeScript template with sensible defaults
 3. Give the repository a name and define the visbility.
 4. Clone the repository (`git clone <URL>`) and open the project in your terminal (`cd <project-name>`).
 5. Execute the setup.sh script (`./setup.sh`) and follow the setup instructions.
-6. Adjust the `package.json` file(s) to match your project (fields like *repository*, *author*, ..).
 
 ---
 
@@ -21,6 +20,11 @@ This repository offers a ready-to-use TypeScript template with sensible defaults
 - **`None`** - Frontend project only.
 
 More options will follow in the future.
+
+### Module Type
+
+- **`CommonJS (CJS)`** – Legacy Node.js modules with `require()`/`module.exports`. Best for older projects.
+- **`ES Modules (ESM)`** – Modern `import`/`export` syntax. Recommended for new projects and tooling.
 
 ### Docker
 
@@ -37,6 +41,25 @@ More options will follow in the future.
 - **`MPL-2.0`** - Light/ File-Level Copyleft
 - **`Custom Licence`** - Will create an empty `LICENCE` file, that needs to be filled with the content of your prefered licence model.
 - **`No Licence`** - Will not create a `LICENCE` file.
+
+### Provide more Information
+
+During setup, you decide if you want to provide additional details for your `package.json` files:
+
+- *`*Project-Name`**: The name of your project.
+- **`Description`**: A short summary of your project.
+- **`Author`**: Even if you select "No" for a license, you might still be asked for the author name, as some license models (e.g., MIT, Apache-2.0) require author attribution.
+- **`Repository-URL`**: The URL of your GitHub repository.
+- **`Keywords`**: Relevant keywords to improve discoverability.
+
+### Commit Changes
+
+You can choose whether to automatically create a commit after running the setup script:
+
+- **`Yes`**: The setup script will create a new commit with a customizable commit message (default: `Initial commit`). You can edit the message before confirming.
+- **`No`**: No commit will be created; you can review changes and commit manually.
+
+This option helps you control your project's initial commit history.
 
 ---
 
