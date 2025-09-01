@@ -1,0 +1,12 @@
+services:
+  node-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: dominic86/mursica-fm-backend:1.2.0-beta.1
+    container_name: mursica-fm-backend
+    env_file:
+    - ./backend/.env
+    ports:
+      - "3000:3000"
+      - "9229:9229"
