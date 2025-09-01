@@ -4,6 +4,9 @@ option_backend=0
 option_module=0
 option_docker=0
 option_licence=0
+option_commit=0
+
+commit_message="Initial commit"
 
 # * 1 - Backend Runtime
 options=("Node.js" "None")
@@ -128,13 +131,52 @@ select opt in "${options[@]}"; do
     esac
 done
 
+echo ""
+
+# * 5 - Commit changes
+
+options=(
+  "Yes"
+  "No"
+)
+
+echo "Commit changes?"
+select opt in "${options[@]}"; do
+    case $opt in
+        "Yes")
+            option_commit=1
+            break
+            ;;
+        "No")
+            option_commit=2
+            break
+            ;;
+        *)
+            echo "Invalid option. Please choose 1 or 2."
+            ;;
+    esac
+done
+
+echo ""
+
+# Ask for commit message
+
+if [ $option_commit -eq 1 ]; then
+    echo "Enter commit message (Default: 'Initial commit'):"
+    read custom_commit_message
+
+    if [ -n "$custom_commit_message" ]; then
+        commit_message="$custom_commit_message"
+    fi
+fi
+
 ####################################################################################################################################
 ####################################################################################################################################
 ####################################################################################################################################
 
 # Check for selection error
 
-if [ $option_backend -eq 0 ] || [ $option_docker -eq 0 ] || [ $option_licence -eq 0 ] || [ $option_module -eq 0 ]; then
+if [ $option_backend -eq 0 ] || [ $option_docker -eq 0 ] || [ $option_licence -eq 0 ] || [ $option_module -eq 0 ] || [ $option_commit -eq 0 ]; then
     echo "Error: No valid options selected."
     exit 1
 fi
@@ -164,7 +206,7 @@ elif [ $option_backend -eq 1 ]; then
     rm backend/Dockerfile
     rm backend/nodemon.json
     mv backend/nodemon-local.json backend/nodemon.json
-    sed -i 's|--legacy-watch --watch ./src --ext ts --exec '\''node --inspect=0.0.0.0:9229 --nolazy --loader ts-node/esm'\''|--watch ./src --ext ts --exec "node --inspect=9229 --nolazy --loader ts-node/esm"|' backend/package.json
+    sed -i 's|--legacy-watch --watch ./src --ext ts --exec '\''node --inspect=0.0.0.0:9229 --nolazy --loader ts-node/esm'\''|--watch ./src --ext ts --exec node --inspect=9229 --nolazy --loader ts-node/esm|' backend/package.json
 else
     rm docker-compose.yaml
 fi
@@ -243,6 +285,13 @@ cd ..
 if [ $option_backend -eq 2 ]; then
     mv frontend/* .
     rmdir frontend
+fi
+
+# * 7 - Commit changes
+
+if [ $option_commit -eq 1 ]; then
+    git add .
+    git commit -m "$commit_message"
 fi
 
 echo "Setup completed!"
