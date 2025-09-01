@@ -1,9 +1,9 @@
 #!/bin/bash
 
-option_backend=1
-option_module=1
-option_docker=1
-option_licence=1
+option_backend=0
+option_module=0
+option_docker=0
+option_licence=0
 
 # * 1 - Backend Runtime
 options=("Node.js" "None")
@@ -53,31 +53,31 @@ echo ""
 
 # * 3 - Docker Integration
 
-# TODO: Only ask this, if backend = YES
-
-# options=("yes" "no")
-
-# echo "Enable Docker integration?"
-# select opt in "${options[@]}"
-# do
-#     case $opt in
-#         "yes")
-#             echo "Docker integration enabled."
-#             option_docker=1
-#             break
-#             ;;
-#         "no")
-#             echo "Docker integration disabled."
-#             option_docker=2
-#             break
-#             ;;
-#         *)
-#             echo "Invalid option. Please choose 1 or 2."
-#             ;;
-#     esac
-# done
-
-# echo ""
+if [ $option_backend -eq 1 ]; then
+    options=("yes" "no")
+    echo "Enable Docker integration?"
+    select opt in "${options[@]}"
+    do
+        case $opt in
+            "yes")
+                echo "Docker integration enabled."
+                option_docker=1
+                break
+                ;;
+            "no")
+                echo "Docker integration disabled."
+                option_docker=2
+                break
+                ;;
+            *)
+                echo "Invalid option. Please choose 1 or 2."
+                ;;
+        esac
+    done
+    echo ""
+else
+    option_docker=2
+fi
 
 # * 4 - Licence
 
@@ -153,7 +153,16 @@ if [ $option_module -eq 2 ]; then
     sed -i 's/"type": *"commonjs"/"type": "module"/' frontend/package.json
 fi
 
-# Docker
+# * 3 - Docker
+if [ $option_docker -eq 1 ]; then
+    rm backend/nodemon-local.json
+else
+    rm docker-compose.yaml
+    rm backend/Dockerfile
+    rm backend/nodemon.json
+    mv backend/nodemon-local.json backend/nodemon.json
+    sed -i 's|--legacy-watch --watch ./src --ext ts --exec '\''node --inspect=0.0.0.0:9229 --nolazy --loader ts-node/esm'\''|--watch ./src --ext ts --exec "node --inspect=9229 --nolazy --loader ts-node/esm"|' backend/package.json
+fi
 
 # TODO - Docker related files + Nodemon
 
@@ -162,21 +171,45 @@ fi
 case $option_licence in
     1)
         cp licences/MIT-LICENCE LICENCE
+        if [ $option_backend -eq 1 ]; then
+            sed -i 's/"license": *""/"license": "MIT"/' backend/package.json
+        fi
+        sed -i 's/"license": *""/"license": "MIT"/' frontend/package.json
         ;;
     2)
         cp licences/APACHE2.0-LICENCE LICENCE
+        if [ $option_backend -eq 1 ]; then
+            sed -i 's/"license": *""/"license": "Apache-2.0"/' backend/package.json
+        fi
+        sed -i 's/"license": *""/"license": "Apache-2.0"/' frontend/package.json
         ;;
     3)
         cp licences/GPL3.0-LICENCE LICENCE
+        if [ $option_backend -eq 1 ]; then
+            sed -i 's/"license": *""/"license": "GPL-3.0"/' backend/package.json
+        fi
+        sed -i 's/"license": *""/"license": "GPL-3.0"/' frontend/package.json
         ;;
     4)
         cp licences/LGPL3.0-LICENCE LICENCE
+        if [ $option_backend -eq 1 ]; then
+            sed -i 's/"license": *""/"license": "LGPL-3.0"/' backend/package.json
+        fi
+        sed -i 's/"license": *""/"license": "LGPL-3.0"/' frontend/package.json
         ;;
     5)
         cp licences/MPL2.0-LICENCE LICENCE
+        if [ $option_backend -eq 1 ]; then
+            sed -i 's/"license": *""/"license": "MPL-2.0"/' backend/package.json
+        fi
+        sed -i 's/"license": *""/"license": "MPL-2.0"/' frontend/package.json
         ;;
     6)
         touch LICENCE
+        if [ $option_backend -eq 1 ]; then
+            sed -i 's/"license": *""/"license": "UNLICENSED"/' backend/package.json
+        fi
+        sed -i 's/"license": *""/"license": "UNLICENSED"/' frontend/package.json
         ;;
     7)
         echo "No LICENCE file will be created."
