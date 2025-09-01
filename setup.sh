@@ -1,12 +1,12 @@
 #!/bin/bash
 
+option_backend=1
+option_module=1
+option_docker=1
+option_licence=1
+
 # * 1 - Backend Runtime
-
 options=("Node.js" "None")
-
-option_backend=0
-option_docker=0
-option_licence=0
 
 echo "Please choose a backend runtime:"
 select opt in "${options[@]}"
@@ -28,35 +28,58 @@ done
 
 echo ""
 
-# * 2 - Docker Integration
+# * 2 - Module Type
+options=("CommonJS" "ESM")
 
-# TODO: Only ask this, if backend = YES
-
-options=("yes" "no")
-
-echo "Enable Docker integration?"
+echo "Please choose a module type:"
 select opt in "${options[@]}"
 do
     case $opt in
-        "yes")
-            echo "Docker integration enabled."
-            option_docker=1
+        "CommonJS")
+            option_module=1
             break
             ;;
-        "no")
-            echo "Docker integration disabled."
-            option_docker=2
+        "ESM")
+            option_module=2
             break
             ;;
         *)
-            echo "Invalid option. Please choose 1 or 2."
+            echo "Invalid option. Try again."
             ;;
     esac
 done
 
 echo ""
 
-# * 3 - Licence
+# * 3 - Docker Integration
+
+# TODO: Only ask this, if backend = YES
+
+# options=("yes" "no")
+
+# echo "Enable Docker integration?"
+# select opt in "${options[@]}"
+# do
+#     case $opt in
+#         "yes")
+#             echo "Docker integration enabled."
+#             option_docker=1
+#             break
+#             ;;
+#         "no")
+#             echo "Docker integration disabled."
+#             option_docker=2
+#             break
+#             ;;
+#         *)
+#             echo "Invalid option. Please choose 1 or 2."
+#             ;;
+#     esac
+# done
+
+# echo ""
+
+# * 4 - Licence
 
 options=(
   "MIT"
@@ -105,40 +128,52 @@ select opt in "${options[@]}"; do
     esac
 done
 
+####################################################################################################################################
+####################################################################################################################################
+####################################################################################################################################
+
 # Check for selection error
 
-if [ $option_backend -eq 0 ] && [ $option_docker -eq 0 ] && [ $option_licence -eq 0 ]; then
+if [ $option_backend -eq 0 ] || [ $option_docker -eq 0 ] || [ $option_licence -eq 0 ] || [ $option_module -eq 0 ]; then
     echo "Error: No valid options selected."
     exit 1
 fi
 
-# Remove backend
-
+# * 1 - Remove backend
 if [ $option_backend -eq 2 ]; then
     rm -rf backend/
+else
+    cp backend/.example.env backend/.env
+fi
+
+# * 2 - Set module type
+if [ $option_module -eq 2 ]; then
+    # ESM
+    sed -i 's/"type": *"commonjs"/"type": "module"/' backend/package.json
+    sed -i 's/"type": *"commonjs"/"type": "module"/' frontend/package.json
 fi
 
 # Docker
 
 # TODO - Docker related files + Nodemon
 
-# Licence
+# * 4 - Licence
 
 case $option_licence in
     1)
-        cp licences/MIT-LICENCE.md LICENCE
+        cp licences/MIT-LICENCE LICENCE
         ;;
     2)
-        cp licences/Apache-2.0-LICENCE.md LICENCE
+        cp licences/APACHE2.0-LICENCE LICENCE
         ;;
     3)
-        cp licences/GPL-3.0-LICENCE.md LICENCE
+        cp licences/GPL3.0-LICENCE LICENCE
         ;;
     4)
-        cp licences/LGPL-3.0-LICENCE.md LICENCE
+        cp licences/LGPL3.0-LICENCE LICENCE
         ;;
     5)
-        cp licences/MPL-2.0-LICENCE.md LICENCE
+        cp licences/MPL2.0-LICENCE LICENCE
         ;;
     6)
         touch LICENCE
@@ -152,7 +187,15 @@ case $option_licence in
         ;;
 esac
 
-echo "Setup completed!"
+rm -rf licences/
 
-rm -rf /licences/
+# * 5 - Install packages
+
+cd backend
+npm install
+cd ../frontend
+npm install
+cd ..
+
+echo "Setup completed!"
 rm setup.sh
