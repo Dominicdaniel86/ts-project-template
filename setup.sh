@@ -152,18 +152,21 @@ if [ $option_module -eq 2 ]; then
     if [ $option_backend -eq 1 ]; then
         sed -i 's/"type": *"commonjs"/"type": "module"/' backend/package.json
     else
-    sed -i 's/"type": *"commonjs"/"type": "module"/' frontend/package.json
+        sed -i 's/"type": *"commonjs"/"type": "module"/' frontend/package.json
+    fi
 fi
 
 # * 3 - Docker
 if [ $option_docker -eq 1 ]; then
     rm backend/nodemon-local.json
-else
+elif [ $option_backend -eq 1 ]; then
     rm docker-compose.yaml
     rm backend/Dockerfile
     rm backend/nodemon.json
     mv backend/nodemon-local.json backend/nodemon.json
     sed -i 's|--legacy-watch --watch ./src --ext ts --exec '\''node --inspect=0.0.0.0:9229 --nolazy --loader ts-node/esm'\''|--watch ./src --ext ts --exec "node --inspect=9229 --nolazy --loader ts-node/esm"|' backend/package.json
+else
+    rm docker-compose.yaml
 fi
 
 # TODO - Docker related files + Nodemon
